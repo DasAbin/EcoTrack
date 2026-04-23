@@ -37,7 +37,8 @@ ALTER TABLE scores ENABLE ROW LEVEL SECURITY;
 
 -- Simple RLS Policies (can be refined later)
 CREATE POLICY "Public orgs are viewable by everyone" ON orgs FOR SELECT USING (true);
-CREATE POLICY "Users can view their own profile" ON profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Profiles are viewable by everyone" ON profiles FOR SELECT USING (true);
+CREATE POLICY "Users can insert their own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
 CREATE POLICY "Users can update their own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
 CREATE POLICY "Users can view scores in their org" ON scores FOR SELECT USING (
   EXISTS (
@@ -45,7 +46,10 @@ CREATE POLICY "Users can view scores in their org" ON scores FOR SELECT USING (
     WHERE profiles.id = auth.uid() AND profiles.org_id = scores.org_id
   )
 );
+-- Own rows: ensures PostgREST can DELETE rows you own (DELETE only applies to SELECT-visible rows).
+CREATE POLICY "Users can view their own score rows" ON scores FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can insert their own scores" ON scores FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can delete their own scores" ON scores FOR DELETE USING (auth.uid() = user_id);
 
 -- Create leaderboard view
 CREATE OR REPLACE VIEW leaderboard_view AS

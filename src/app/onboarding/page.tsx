@@ -49,9 +49,9 @@ export default function OnboardingPage() {
         .upsert({
           id: user.id,
           email: user.email,
-          name,
-          age: parseInt(age),
-          occupation,
+          name: name || null,
+          age: age ? parseInt(age) : null,
+          occupation: occupation || null,
           org_id: targetOrgId
         })
 
@@ -106,7 +106,7 @@ export default function OnboardingPage() {
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Role</label>
-                <Select value={occupation} onValueChange={setOccupation} required>
+                <Select value={occupation} onValueChange={(value) => setOccupation(value ?? '')} required>
                   <SelectTrigger>
                     <SelectValue placeholder="Select..." />
                   </SelectTrigger>
@@ -120,11 +120,11 @@ export default function OnboardingPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Organization Slug</label>
               <Input
-                placeholder="e.g. ait-pune"
+                placeholder="e.g. your-college-slug"
                 value={orgSlug}
                 onChange={(e) => setOrgSlug(e.target.value)}
               />
-              <p className="text-xs text-muted-foreground">Optional: Connect with your community.</p>
+              <p className="text-xs text-muted-foreground">Preferred but optional: add your college or company to join its leaderboard (example: ait-pune).</p>
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <>Finish Setup <ArrowRight className="ml-2 h-4 w-4" /></>}

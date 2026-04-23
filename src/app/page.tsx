@@ -1,68 +1,111 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Leaf, Globe, Zap, Users } from 'lucide-react';
+import { createClient } from '@/lib/supabase/server';
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  let profile = null;
+  if (user) {
+    const { data } = await supabase.from('profiles').select('name').eq('id', user.id).single();
+    profile = data;
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="px-4 lg:px-6 h-14 flex items-center">
-        <Link className="flex items-center justify-center" href="/">
-          <Leaf className="h-6 w-6 text-primary" />
-          <span className="ml-2 font-bold text-xl">EcoTrack</span>
+      <header className="px-4 lg:px-6 h-16 flex items-center bg-black/40 backdrop-blur-md sticky top-0 z-50">
+        <Link className="flex items-center justify-center font-bold text-xl text-white" href="/">
+          <Leaf className="h-6 w-6 mr-2 text-primary" />
+          EcoTrack
         </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="/login">
-            Login
-          </Link>
+        <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
+          {user ? (
+            <Link href="/dashboard">
+              <Button variant="outline" size="sm" className="border-primary bg-primary/20 text-white hover:bg-primary hover:text-white rounded-full font-medium shadow-md shadow-primary/20">
+                Hi, {profile?.name?.split(' ')[0] || 'Explorer'}
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/login">
+              <Button variant="outline" size="sm" className="border-white/20 text-white bg-white/10 hover:bg-white hover:text-black rounded-full font-medium">
+                Login
+              </Button>
+            </Link>
+          )}
         </nav>
       </header>
-      <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-primary/5">
-          <div className="container px-4 md:px-6 mx-auto">
-            <div className="flex flex-col items-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-                  Analyze Your Eco-Impact in Seconds
-                </h1>
-                <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-                  Personal + community eco-impact analyzer for the Indian context. 
-                  Use AI to track your footprint and compete with your organization.
-                </p>
+      <main className="flex-1 bg-background">
+        <section className="relative w-full h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden">
+          {/* Background Image and Overlay */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: "url('/hero-bg.png')" }}
+          />
+          <div className="absolute inset-0 bg-black/50" /> {/* Dark overlay for text readability */}
+          
+          <div className="container relative px-4 md:px-6 mx-auto z-10">
+            <div className="flex flex-col items-center space-y-8 text-center max-w-4xl mx-auto">
+              {/* Optional sub-pill matching the leaf vibe */}
+              <div className="inline-flex items-center rounded-full border border-white/30 bg-black/20 px-4 py-1.5 text-sm text-white font-medium backdrop-blur-sm">
+                <Leaf className="mr-2 h-4 w-4" /> EcoTrack 2026
               </div>
-              <div className="space-x-4">
-                <Link href="/login">
-                  <Button size="lg" className="bg-primary hover:bg-primary/90">Get Started</Button>
+              
+              {/* Massive White Uppercase Header to match reference */}
+              <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-[5.5rem] leading-none text-white drop-shadow-lg uppercase">
+                WE TRACK OUR <br /> ENVIRONMENT
+              </h1>
+              
+              <p className="mx-auto max-w-[700px] text-white/90 md:text-xl font-medium tracking-wide drop-shadow-md">
+                Personal & community eco-impact analyzer natively built for the Indian context. 
+                Reduce, Reuse, Recycle.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-6 px-4">
+                <Link href="/login" className="w-full sm:w-auto">
+                  <Button size="lg" className="w-full sm:w-auto h-14 px-10 text-base rounded-full border-2 border-white bg-transparent text-white hover:bg-white hover:text-black transition-all duration-300 uppercase tracking-widest backdrop-blur-sm">
+                    Get Started
+                  </Button>
                 </Link>
-                <Link href="/org/mit-pune">
-                  <Button size="lg" variant="outline">View Demo Org</Button>
+                <Link href="/org/mit-pune" className="w-full sm:w-auto">
+                  <Button size="lg" className="w-full sm:w-auto h-14 px-10 text-base rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 uppercase tracking-widest border-2 border-primary shadow-lg border-transparent">
+                    View Demo
+                  </Button>
                 </Link>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-background">
+        <section className="w-full py-16 md:py-24 bg-primary/5 rounded-t-[3rem] mt-10 shadow-sm border-t border-primary/10">
           <div className="container px-4 md:px-6 mx-auto">
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="flex flex-col items-center space-y-2 border p-6 rounded-xl bg-card">
-                <Zap className="h-10 w-10 text-primary mb-2" />
-                <h3 className="text-xl font-bold">AI Analysis</h3>
-                <p className="text-sm text-muted-foreground text-center">
-                  Simply describe your day and our AI extracts activities and calculates your CO2 footprint.
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
+              <div className="group flex flex-col space-y-4 border border-border/50 p-8 rounded-[2rem] bg-card hover:shadow-xl hover:shadow-primary/5 transition-all duration-300">
+                <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Zap className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-2xl font-bold tracking-tight">AI Analysis</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Simply describe your day and our AI invisibly extracts your activities to calculate a highly precise CO₂ footprint.
                 </p>
               </div>
-              <div className="flex flex-col items-center space-y-2 border p-6 rounded-xl bg-card">
-                <Users className="h-10 w-10 text-primary mb-2" />
-                <h3 className="text-xl font-bold">Community</h3>
-                <p className="text-sm text-muted-foreground text-center">
-                  Join your organization's leaderboard and see who's making the most impact.
+              <div className="group flex flex-col space-y-4 border border-border/50 p-8 rounded-[2rem] bg-card hover:shadow-xl hover:shadow-primary/5 transition-all duration-300">
+                <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Users className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-2xl font-bold tracking-tight">Community</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Join your college or corporate leaderboard anonymously. See who's making the biggest impact this week.
                 </p>
               </div>
-              <div className="flex flex-col items-center space-y-2 border p-6 rounded-xl bg-card">
-                <Globe className="h-10 w-10 text-primary mb-2" />
-                <h3 className="text-xl font-bold">Indian Context</h3>
-                <p className="text-sm text-muted-foreground text-center">
-                  Emission factors and suggestions tailored specifically for life in India.
+              <div className="group flex flex-col space-y-4 border border-border/50 p-8 rounded-[2rem] bg-card hover:shadow-xl hover:shadow-primary/5 transition-all duration-300">
+                <div className="h-14 w-14 rounded-full bg-accent/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Globe className="h-6 w-6 text-accent-foreground" />
+                </div>
+                <h3 className="text-2xl font-bold tracking-tight">Indian Context</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Our models natively understand Auto-Rickshaws, Local Trains, and Indian emission factors out of the box.
                 </p>
               </div>
             </div>

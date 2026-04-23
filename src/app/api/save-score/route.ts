@@ -1,8 +1,10 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Groq from 'groq-sdk';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
 
 export async function POST(req: Request) {
   try {
@@ -26,23 +28,37 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Organization not set' }, { status: 400 });
     }
 
-    // Generate suggestions using Gemini
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-    const suggestionPrompt = `Based on this eco-impact breakdown (kg CO2e): ${JSON.stringify(breakdown)}.
-    Provide 3 specific actionable tips for the Indian context to reduce this impact.
-    Return ONLY a JSON array of 3 strings. No explanation.`;
+    // Generate suggestions using Groq
+    const completion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: "You are an Indian eco-advisor. Respond ONLY with a valid JSON OBJECT containing a single key 'tips' that holds an array of 3 string tips based on the CO2 footprint data. Example format: { \"tips\": [\"Take the metro today instead of cab\", \"Use a reusable bag\", \"Turn off AC when not needed\"] }"
+        },
+        {
+          role: "user",
+          content: `My breakdown: ${JSON.stringify(breakdown)}.`
+        }
+      ],
+      model: "llama-3.1-8b-instant",
+      temperature: 0.7,
+      response_format: { type: "json_object" },
+    });
 
-    const result = await model.generateContent(suggestionPrompt);
-    const response = await result.response;
-    let jsonText = response.text().trim();
+    let jsonText = completion.choices[0]?.message?.content || '{"tips": ["Conserve energy", "Use public transport", "Reduce plastic waste"]}';
     
-    if (jsonText.startsWith('```json')) {
-      jsonText = jsonText.replace(/^```json/, '').replace(/```$/, '').trim();
-    } else if (jsonText.startsWith('```')) {
-        jsonText = jsonText.replace(/^```/, '').replace(/```$/, '').trim();
+    let suggestions = [];
+    try {
+      const parsed = JSON.parse(jsonText);
+      suggestions = parsed.tips ? parsed.tips : (Array.isArray(parsed) ? parsed : Object.values(parsed)[0]);
+      
+      // Fallback if formatting is weird
+      if (!Array.isArray(suggestions) || suggestions.length === 0) {
+        suggestions = ["Switch to local trains", "Avoid single-use plastics", "Turn off electronics when idle"];
+      }
+    } catch {
+      suggestions = ["Use public transit", "Avoid plastics", "Save electricity"];
     }
-
-    const suggestions = JSON.parse(jsonText);
 
     // Save to DB
     const { error: insertError } = await supabase.from('scores').insert({

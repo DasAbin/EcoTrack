@@ -87,58 +87,63 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --background: 85 30% 98%;    /* Pure faint organic cream */
+    --foreground: 160 40% 10%;   /* Extremely dark green */
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 160 40% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 142 76% 24%; /* #166534 */
-    --primary-foreground: 355.7 100% 97.3%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 38 92% 50%; /* #f59e0b */
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
+    --popover-foreground: 160 40% 10%;
+    
+    --primary: 82 85% 42%;       /* Stunning Greenze Lime/Apple Green */
+    --primary-foreground: 160 80% 5%;
+    
+    --secondary: 160 20% 94%;    
+    --secondary-foreground: 160 40% 10%;
+    
+    --muted: 100 15% 92%;
+    --muted-foreground: 160 10% 40%;
+    
+    --accent: 82 85% 42%;        
+    --accent-foreground: 160 80% 5%;
+    
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 142 76% 24%;
-    --radius: 0.5rem;
-    --chart-1: 142 76% 36%;
-    --chart-2: 142 76% 46%;
-    --chart-3: 142 76% 56%;
-    --chart-4: 142 76% 66%;
-    --chart-5: 142 76% 76%;
+    
+    --border: 100 15% 88%;
+    --input: 100 15% 88%;
+    --ring: 82 85% 42%;
+    
+    /* Elegant soft pill rounding common in Dribbble reference */
+    --radius: 1.5rem; 
   }
 
+  /* Optional dark mode for those who still prefer it */
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 142 71% 29%; /* #15803d */
-    --primary-foreground: 355.7 100% 97.3%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 38 92% 50%; /* #f59e0b */
-    --accent-foreground: 0 0% 98%;
+    --background: 160 30% 6%;
+    --foreground: 85 30% 98%;
+    --card: 160 25% 9%;          
+    --card-foreground: 85 30% 98%;
+    --popover: 160 25% 9%;
+    --popover-foreground: 85 30% 98%;
+    
+    --primary: 82 85% 45%;      
+    --primary-foreground: 160 80% 5%;
+    
+    --secondary: 160 20% 15%;    
+    --secondary-foreground: 85 30% 98%;
+    
+    --muted: 160 20% 15%;
+    --muted-foreground: 80 15% 65%;
+    
+    --accent: 82 85% 45%;        
+    --accent-foreground: 160 80% 5%;
+    
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 142 71% 29%;
-    --chart-1: 142 71% 39%;
-    --chart-2: 142 71% 49%;
-    --chart-3: 142 71% 59%;
-    --chart-4: 142 71% 69%;
-    --chart-5: 142 71% 79%;
+    
+    --border: 160 20% 15%;
+    --input: 160 20% 15%;
+    --ring: 82 85% 45%;
   }
 }
 

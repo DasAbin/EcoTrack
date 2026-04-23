@@ -61,23 +61,38 @@ export async function updateSession(request: NextRequest) {
   const isPublicPage = request.nextUrl.pathname === '/' || request.nextUrl.pathname.startsWith('/org/') || isAuthPage
 
   if (!user && !isPublicPage) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    const url = new URL('/login', request.url)
+    const redirectResponse = NextResponse.redirect(url)
+    // Copy cookies from original response to the redirect response
+    response.cookies.getAll().forEach(cookie => {
+      redirectResponse.cookies.set(cookie.name, cookie.value)
+    })
+    return redirectResponse
   }
 
   if (user) {
-    // Check if profile exists
     const { data: profile } = await supabase
       .from('profiles')
       .select('org_id, name, age, occupation')
       .eq('id', user.id)
       .single()
 
-    if (!profile || !profile.name || !profile.age || !profile.occupation) {
+    if (!profile) {
       if (request.nextUrl.pathname !== '/onboarding' && !isAuthPage) {
-        return NextResponse.redirect(new URL('/onboarding', request.url))
+        const url = new URL('/onboarding', request.url)
+        const redirectResponse = NextResponse.redirect(url)
+        response.cookies.getAll().forEach(cookie => {
+          redirectResponse.cookies.set(cookie.name, cookie.value)
+        })
+        return redirectResponse
       }
     } else if (isAuthPage || request.nextUrl.pathname === '/onboarding') {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
+      const url = new URL('/dashboard', request.url)
+      const redirectResponse = NextResponse.redirect(url)
+      response.cookies.getAll().forEach(cookie => {
+        redirectResponse.cookies.set(cookie.name, cookie.value)
+      })
+      return redirectResponse
     }
   }
 

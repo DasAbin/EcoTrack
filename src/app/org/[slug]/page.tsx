@@ -6,14 +6,15 @@ import { Leaf, Users, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-export default async function OrgLandingPage({ params }: { params: { slug: string } }) {
+export default async function OrgLandingPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const supabase = await createClient();
 
   // Fetch org details
   const { data: org } = await supabase
     .from('orgs')
     .select('*')
-    .eq('slug', params.slug)
+    .eq('slug', slug)
     .single();
 
   if (!org) {
