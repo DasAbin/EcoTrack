@@ -87,13 +87,14 @@ User description: "${text}"`;
     const breakdown: Record<string, number> = {};
 
     const processedActivities = activities.map((activity) => {
-      const factor = EMISSION_FACTORS[activity.type as ActivityType] || 0;
+      const typeKey = String(activity.type ?? 'unknown');
+      const factor = EMISSION_FACTORS[typeKey as ActivityType] || 0;
       const qty = typeof activity.quantity === 'number' ? activity.quantity : Number(activity.quantity) || 0;
       const score = qty * factor;
       total_score += score;
-      breakdown[activity.type] = (breakdown[activity.type] || 0) + score;
+      breakdown[typeKey] = (breakdown[typeKey] || 0) + score;
       return {
-        type: activity.type,
+        type: typeKey,
         quantity: qty,
         unit: activity.unit ?? '',
         label: activity.label ?? '',

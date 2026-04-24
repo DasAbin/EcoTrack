@@ -40,7 +40,9 @@ export default function LeaderboardPage() {
 
       // Fetch Org Leaderboard (If joined)
       if (profile?.org_id) {
-        setOrgName(profile.orgs?.name || '');
+        const orgsRel = profile.orgs as { name: string } | { name: string }[] | null | undefined;
+        const orgLabel = Array.isArray(orgsRel) ? orgsRel[0]?.name : orgsRel?.name;
+        setOrgName(orgLabel || '');
         const { data: leaderboard } = await supabase
           .from('leaderboard_view')
           .select('*')

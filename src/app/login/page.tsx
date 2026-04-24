@@ -192,7 +192,7 @@ export default function AuthPage() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Role</label>
-                    <Select value={occupation} onValueChange={(value) => setOccupation(value)}>
+                    <Select value={occupation} onValueChange={(value) => setOccupation(value ?? '')}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select..." />
                       </SelectTrigger>
