@@ -22,10 +22,10 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 async function seed() {
   console.log('🌱 Starting seed...');
 
-  // 1. Create Org
+  // 1. Create org (slug must match homepage “View Demo” link: /org/mit-pune)
   const { data: org, error: orgError } = await supabase
     .from('orgs')
-    .upsert({ name: 'AIT Pune', slug: 'ait-pune' }, { onConflict: 'slug' })
+    .upsert({ name: 'MIT Pune', slug: 'mit-pune' }, { onConflict: 'slug' })
     .select()
     .single();
 

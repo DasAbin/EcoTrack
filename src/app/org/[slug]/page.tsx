@@ -1,10 +1,24 @@
 import { createClient } from '@/lib/supabase/server';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Leaf, Users, Trophy } from 'lucide-react';
+import { Users, Trophy, Leaf } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+
+type LeaderboardRow = {
+  user_id: string;
+  name: string | null;
+  total_score: number;
+};
+
+const DEMO_LEADERBOARD: LeaderboardRow[] = [
+  { user_id: 'demo-1', name: 'Priya Sharma', total_score: 8.42 },
+  { user_id: 'demo-2', name: 'Arjun Mehta', total_score: 11.05 },
+  { user_id: 'demo-3', name: 'Ananya Iyer', total_score: 14.28 },
+  { user_id: 'demo-4', name: 'Rohan Patil', total_score: 16.91 },
+  { user_id: 'demo-5', name: 'Kavya Nair', total_score: 19.33 },
+];
 
 export default async function OrgLandingPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -35,15 +49,17 @@ export default async function OrgLandingPage({ params }: { params: Promise<{ slu
     .order('total_score', { ascending: true })
     .limit(5);
 
+  const leaderboardRows: LeaderboardRow[] =
+    leaderboard && leaderboard.length > 0
+      ? (leaderboard as LeaderboardRow[])
+      : DEMO_LEADERBOARD;
+  const isDemoLeaderboard = !leaderboard || leaderboard.length === 0;
+  const displayMemberCount =
+    (memberCount ?? 0) > 0 ? memberCount : 42;
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <header className="px-4 lg:px-6 h-14 flex items-center border-b">
-        <Link className="flex items-center justify-center" href="/">
-          <Leaf className="h-6 w-6 text-primary mr-2" />
-          <span className="font-bold">EcoTrack</span>
-        </Link>
-      </header>
-      <main className="flex-1">
+      <div className="flex-1 flex flex-col">
         <section className="w-full py-12 md:py-24 lg:py-32 bg-primary/5">
           <div className="container px-4 md:px-6 mx-auto">
             <div className="flex flex-col items-center space-y-4 text-center">
@@ -52,7 +68,12 @@ export default async function OrgLandingPage({ params }: { params: Promise<{ slu
                   {org.name} Eco Community
                 </h1>
                 <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-                  Join {memberCount || 0} members in tracking and reducing your environmental impact.
+                  Join {displayMemberCount} members in tracking and reducing your environmental impact.
+                  {isDemoLeaderboard && (
+                    <span className="block text-sm mt-2 text-muted-foreground/80">
+                      Member count is illustrative until your org has active accounts.
+                    </span>
+                  )}
                 </p>
               </div>
               <div className="space-x-4">
@@ -75,10 +96,15 @@ export default async function OrgLandingPage({ params }: { params: Promise<{ slu
                 </div>
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Impact Leaderboard</h2>
                 <p className="text-muted-foreground md:text-lg">
-                  See who's leading the way in sustainability at {org.name}.
+                  See who is leading the way in sustainability at {org.name}.
                 </p>
                 <Card className="mt-4">
                   <CardContent className="p-0">
+                    {isDemoLeaderboard && (
+                      <p className="px-4 pt-4 pb-2 text-xs text-muted-foreground border-b border-border/60">
+                        Sample leaderboard for this demo — log activities after joining to see live ranks.
+                      </p>
+                    )}
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -88,20 +114,13 @@ export default async function OrgLandingPage({ params }: { params: Promise<{ slu
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {leaderboard?.map((row, i) => (
+                        {leaderboardRows.map((row, i) => (
                           <TableRow key={row.user_id}>
                             <TableCell className="font-bold">{i + 1}</TableCell>
                             <TableCell>{row.name}</TableCell>
                             <TableCell className="text-right font-medium">{row.total_score.toFixed(2)} kg</TableCell>
                           </TableRow>
                         ))}
-                        {(!leaderboard || leaderboard.length === 0) && (
-                          <TableRow>
-                            <TableCell colSpan={3} className="text-center py-4 text-muted-foreground">
-                              No data yet. Be the first to log!
-                            </TableCell>
-                          </TableRow>
-                        )}
                       </TableBody>
                     </Table>
                   </CardContent>
@@ -136,7 +155,7 @@ export default async function OrgLandingPage({ params }: { params: Promise<{ slu
             </div>
           </div>
         </section>
-      </main>
+      </div>
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
         <p className="text-xs text-muted-foreground">© 2026 EcoTrack Inc. All rights reserved.</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
